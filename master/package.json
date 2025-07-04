@@ -1,0 +1,33 @@
+{
+  "name": "sandbox-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc -b",
+    "docker:compose": "docker compose up -d",
+    "start": "npm run build && npm run docker:compose && node dist/index.js",
+    "dev": "npm run docker:compose && nodemon"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.7",
+    "@types/nodemon": "^1.19.6",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.0.0",
+    "express": "^5.1.0",
+    "redis": "^5.5.6",
+    "socket.io": "^4.8.1",
+    "uuid": "^11.1.0"
+  }
+}

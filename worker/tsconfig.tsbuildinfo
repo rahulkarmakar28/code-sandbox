@@ -1,0 +1,1 @@
+{"root":["./src/index.ts","./src/config/language.config.ts","./src/config/redis.config.ts","./src/services/executor.service.ts","./src/services/file.service.ts"],"version":"5.8.3"}

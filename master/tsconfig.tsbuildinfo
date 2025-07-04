@@ -1,0 +1,1 @@
+{"root":["./src/index.ts","./src/socket.ts","./src/config/redis.config.ts","./src/controllers/run.controller.ts","./src/middlwares/ratelimiter.ts","./src/routes/run.route.ts","./src/services/subscriber.ts"],"version":"5.8.3"}

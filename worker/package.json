@@ -1,0 +1,35 @@
+{
+  "name": "worker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc -b",
+    "dev": "nodemon",
+    "docker:build": "npm run docker:c && npm run docker:cpp && npm run docker:java && npm run docker:python && npm run docker:javascript && npm run docker:typescript && npm run docker:golang && npm run docker:rust",
+    "docker:c": "docker build -f dockerfiles/c.Dockerfile -t sandbox-c .",
+    "docker:cpp": "docker build -f dockerfiles/cpp.Dockerfile -t sandbox-cpp .",
+    "docker:java": "docker build -f dockerfiles/java.Dockerfile -t sandbox-java .",
+    "docker:python": "docker build -f dockerfiles/python.Dockerfile -t sandbox-python .",
+    "docker:javascript": "docker build -f dockerfiles/javascript.Dockerfile -t sandbox-javascript .",
+    "docker:typescript": "docker build -f dockerfiles/typescript.Dockerfile -t sandbox-typescript .",
+    "docker:golang": "docker build -f dockerfiles/golang.Dockerfile -t sandbox-golang .",
+    "docker:rust": "docker build -f dockerfiles/rust.Dockerfile -t sandbox-rust .",
+    "start": "npm run build && npm run docker:build && node dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^17.0.1",
+    "redis": "^5.5.6",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/dotenv": "^6.1.1",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2"
+  }
+}
