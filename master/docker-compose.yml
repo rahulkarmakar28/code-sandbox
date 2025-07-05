@@ -1,9 +1,18 @@
 version: '3.8'
 
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ${ECR_MASTER_IMAGE_NAME}
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      - redis
 
-    redis:
-      image: redis:latest
-      container_name: redis
-      ports:
-        - "6379:6379"
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"

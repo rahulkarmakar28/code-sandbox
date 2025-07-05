@@ -8,7 +8,9 @@ RUN npm install
 
 # Copy source files and build
 COPY . .
-RUN npm run build  # assumes this runs `tsc` and outputs to /app/dist
+RUN npm run build
+
+
 
 # 🚀 Production Stage
 FROM node:18-slim AS production
@@ -17,10 +19,12 @@ WORKDIR /app
 
 # Only copy built files and runtime deps
 COPY package*.json ./
-RUN npm install --omit=dev  # install only production dependencies
+RUN npm install --omit=dev
 
 COPY --from=builder /app/dist ./dist
 
+COPY .env ./
+
 EXPOSE 5000
 
-CMD ["node", "dist/index.js"]  # or your actual entry point
+CMD ["node", "dist/index.js"]
