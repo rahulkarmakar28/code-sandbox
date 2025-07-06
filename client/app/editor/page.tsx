@@ -128,19 +128,19 @@ export default function CodeEditor() {
   }
 
   const handleRunCode = async () => {
+    if (!sessionStorage.getItem("verified")) {
+      setError("❌ Human verification failed!")
+      return;
+    }
     setIsLoading(true);
     setError("");
     setOutput("");
 
     try {
-      // const data = 
       await runCodeService(code, selectedLanguage, user?.id!);
-      // setOutput(data);
     } catch (err) {
       console.log(err)
       setError(err ? String(err) : "Unexpected error");
-    } finally {
-      // setIsLoading(false);
     }
   };
 

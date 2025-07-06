@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Code2, Play, Zap, Globe, Users, ArrowRight, Sun, Moon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -10,6 +10,9 @@ import {
   SignedOut,
   UserButton,
 } from '@clerk/nextjs'
+import Turnstile from "@/components/Turnstile"
+
+// If you control the Turnstile component, ensure it accepts the onSuccess prop:
 
 
 const features = [
@@ -48,11 +51,36 @@ const languages = [
 
 export default function LandingPage() {
   const [isDarkMode, setIsDarkMode] = useState(true)
+  const [verified, setVerified] = useState(false);
+  const [message, setMessage] = useState('');
 
   const themeClasses = isDarkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
   const headerClasses = isDarkMode ? "bg-gray-800/50 border-gray-700" : "bg-white/50 border-gray-200"
   const cardClasses = isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
 
+  const handleToken = async (token: string) => {
+    const res = await fetch('http://localhost:5000/api/v1/verify-turnstile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    });
+
+    // const data = await res.json();
+    // console.log(data, res)
+    if (res.ok) {
+      setVerified(true);
+      sessionStorage.setItem("verified", "true")
+      setMessage('✅ Human verified!');
+    } else {
+      setVerified(false);
+      setMessage('❌ Verification failed!');
+    }
+  };
+
+  useEffect(() => {
+    if (sessionStorage.getItem("verified")) setVerified(true);
+  }, [])
+  
   return (
     <div className={`min-h-screen ${themeClasses}`}>
       {/* Header */}
@@ -114,8 +142,15 @@ export default function LandingPage() {
             The fastest way to write, execute, and share code in your browser. No setup required, just pure coding
             experience.
           </p>
+          {!verified && (
+            <>
+              <Turnstile onSuccess={handleToken} />
+              {message && <p className="mt-4">{message}</p>}
+            </>
+          )}
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 mt-4">
             <Link href="/editor">
               <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg">
                 <Play className="w-5 h-5 mr-2" />
@@ -275,6 +310,7 @@ F(9) = 34`}
           </p>
         </div>
       </footer>
+
     </div>
   )
 }

@@ -7,6 +7,7 @@ import { Server } from "socket.io";
 
 
 import runRoutes from "./routes/run.route"
+import turnstileRoutes from "./routes/turnstile.route"
 import { initRedis, initSubscriberRedis } from "./config/redis.config"
 import { rateLimiter } from './middlwares/rateLimiter'
 import { initSubscriber } from "./services/subscriber"
@@ -31,11 +32,14 @@ app.use(cors({
 }))
 app.use(rateLimiter)
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 
 app.get("/", (req: Request, res: Response) => {
     res.send("👋 from Sandbox backend ")
 })
 app.use("/api/v1/run", runRoutes);
+app.use("/api/v1/verify-turnstile", turnstileRoutes);
 
 
 const port: string = process.env.PORT!
