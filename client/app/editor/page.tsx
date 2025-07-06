@@ -81,7 +81,7 @@ const languages = [
   { value: "cpp", label: "C++" },
   { value: "c", label: "C" },
   { value: "go", label: "Go" },
-  { value: "rust", label: "Rust" },
+  //{ value: "rust", label: "Rust" },
 ]
 
 // Dynamically import Monaco Editor to avoid SSR issues
