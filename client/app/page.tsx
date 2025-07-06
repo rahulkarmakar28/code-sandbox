@@ -59,7 +59,7 @@ export default function LandingPage() {
   const cardClasses = isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
 
   const handleToken = async (token: string) => {
-    const res = await fetch('http://localhost:5000/api/v1/verify-turnstile', {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL!}/api/v1/verify-turnstile`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token }),
