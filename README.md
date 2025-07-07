@@ -26,18 +26,7 @@ This system allows users to submit code (in C, C++, Java, Python, Go, Rust, Java
 
 ---
 
-## 🔄 Flow Diagram
-
-### ✅ Diagram 1 – Macro View of the System
-
-![Sandbox Flow](./sandbox_flowchart.png)
-
-> Explains the end-to-end flow from code submission to result delivery.  
-> Includes Browser → Master → Redis → Worker → Master → Browser.
-
----
-
-### ✅ Diagram 2 – Language & Worker Structure
+## 🖼 Architecture Diagram
 
 ![Worker System](./system_design.png)
 
