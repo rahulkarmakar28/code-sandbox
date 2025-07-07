@@ -1,45 +1,29 @@
-import type { Metadata } from 'next'
-import {
-  ClerkProvider
-} from '@clerk/nextjs'
-import { dark } from '@clerk/themes' // Optional, if you're using themes
+import type React from "react"
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
+import "./globals.css"
+import { ClerkProvider } from "@clerk/nextjs"
+import { ThemeProvider } from "@/contexts/theme-context"
 
-import './globals.css'
+const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: 'Code Sandbox',
-  description: 'code compilation website',
-  generator: 'rahulkarmakar28',
-  icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon.ico',
-  },
+  title: "CodeSandbox - Code. Run. Share.",
+  description: "The fastest way to write, execute, and share code in your browser.",
 }
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
-    <html lang="en">
-      <body suppressHydrationWarning={true}>
-        <ClerkProvider
-          appearance={{
-            baseTheme: dark,
-            elements: {
-              card: "shadow-none bg-gray-900 text-white",
-              headerTitle: "text-white",
-              headerSubtitle: "text-gray-400",
-              formButtonPrimary: "bg-indigo-600 hover:bg-indigo-700 text-white",
-              formFieldInput: "bg-gray-800 text-white placeholder-gray-400",
-            },
-          }}
-          publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
-        >
-          {children}
-        </ClerkProvider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" suppressHydrationWarning>
+        <body className={inter.className}>
+          <ThemeProvider>{children}</ThemeProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }
