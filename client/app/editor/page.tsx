@@ -2,18 +2,17 @@
 
 import type React from "react"
 import { useState, useRef, useCallback, useEffect } from "react"
-import { Play, Loader2, Sun, Moon, Code2, Home, Settings, Maximize2, Minimize2 } from "lucide-react"
+import { Play, Loader2, Settings, Maximize2, Minimize2, Users, Share } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { runCodeService } from "../services/operation"
 import { Label } from "@/components/ui/label"
-import Link from "next/link"
-import { runCodeService } from "@/app/services/operation"
-import { useSocket } from "../../hooks/useSocket"
-import { SignedIn, useUser, UserButton } from "@clerk/nextjs"
+import { Header } from "@/components/layout/header"
 import { useTheme } from "@/contexts/theme-context"
+import { useUser } from "@clerk/nextjs"
 import dynamic from "next/dynamic"
 
 // Code templates for different languages
@@ -92,8 +91,10 @@ const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
 })
 
 export default function CodeEditor() {
-  const { theme, toggleTheme } = useTheme()
+  const { theme } = useTheme()
   const isDarkMode = theme === "dark"
+  const { user } = useUser()
+
   const [selectedLanguage, setSelectedLanguage] = useState("python")
   const [code, setCode] = useState(codeTemplates.python)
   const [output, setOutput] = useState("")
@@ -114,22 +115,15 @@ export default function CodeEditor() {
   const [tabSize, setTabSize] = useState([4])
 
   const containerRef = useRef<HTMLDivElement>(null)
-  const { user } = useUser()
+  const editorRef = useRef<any>(null)
 
-  useSocket(`${user?.id}`, (result) => {
-    console.log(result)
-    const { output, error } = JSON.parse(result)
-    if (!error) setOutput(output)
-    else setError(error)
-    setIsLoading(false)
-  })
+
 
   // Check if mobile view
   useEffect(() => {
     const checkMobile = () => {
       setIsMobileView(window.innerWidth < 768)
     }
-
     checkMobile()
     window.addEventListener("resize", checkMobile)
     return () => window.removeEventListener("resize", checkMobile)
@@ -140,12 +134,10 @@ export default function CodeEditor() {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement)
     }
-
     document.addEventListener("fullscreenchange", handleFullscreenChange)
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange)
   }, [])
 
-  // Add proper fullscreen toggle function
   const toggleFullscreen = async () => {
     try {
       if (!document.fullscreenElement) {
@@ -173,7 +165,7 @@ export default function CodeEditor() {
     setIsLoading(true)
     setError("")
     setOutput("")
-    // Switch to output panel on mobile when running code
+
     if (isMobileView) {
       setMobileActivePanel("output")
     }
@@ -222,187 +214,104 @@ export default function CodeEditor() {
   }, [isResizing, handleMouseMove, handleMouseUp, isMobileView])
 
   const themeClasses = isDarkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
-  const headerClasses = isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
   const panelClasses = isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
-
   const monacoTheme = isDarkMode ? "vs-dark" : "light"
 
   return (
     <div className={`h-screen flex flex-col ${themeClasses}`}>
-      {/* Header */}
-      <header className={`${headerClasses} border-b px-3 sm:px-6 py-3 sm:py-4 flex items-center justify-between`}>
-        <div className="flex items-center space-x-2 sm:space-x-3">
-          <Code2 className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" />
-          <h1 className="text-lg sm:text-xl font-bold hidden sm:block">CodeSandbox</h1>
-        </div>
-
-        {/* Mobile Header Controls */}
-        <div className="flex items-center space-x-2 md:hidden">
-          <Select value={selectedLanguage} onValueChange={handleLanguageChange}>
-            <SelectTrigger
-              className={`w-24 text-xs ${isDarkMode ? "bg-gray-700 border-gray-600" : "bg-gray-100 border-gray-300"}`}
-            >
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className={isDarkMode ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"}>
-              {languages.map((lang) => (
-                <SelectItem
-                  key={lang.value}
-                  value={lang.value}
-                  className={isDarkMode ? "text-gray-100 focus:bg-gray-600" : "text-gray-900 focus:bg-gray-100"}
-                >
-                  {lang.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Button
-            onClick={handleRunCode}
-            disabled={isLoading}
-            size="sm"
-            className="bg-green-600 hover:bg-green-700 text-white px-3"
+      <Header showHomeButton showSettingsButton>
+        <Select value={selectedLanguage} onValueChange={handleLanguageChange}>
+          <SelectTrigger
+            className={`w-40 ${isDarkMode ? "bg-gray-700 border-gray-600" : "bg-gray-100 border-gray-300"}`}
           >
-            {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
-          </Button>
-        </div>
-
-        {/* Desktop Header Controls */}
-        <div className="hidden md:flex items-center space-x-4">
-          <Link href="/">
-            <Button
-              variant="ghost"
-              size="sm"
-              className={isDarkMode ? "hover:bg-gray-700 text-gray-300" : "hover:bg-gray-100 text-gray-600"}
-            >
-              <Home className="w-4 h-4 mr-2" />
-              Home
-            </Button>
-          </Link>
-
-          <Select value={selectedLanguage} onValueChange={handleLanguageChange}>
-            <SelectTrigger
-              className={`w-40 ${isDarkMode ? "bg-gray-700 border-gray-600" : "bg-gray-100 border-gray-300"}`}
-            >
-              <SelectValue placeholder="Language" />
-            </SelectTrigger>
-            <SelectContent className={isDarkMode ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"}>
-              {languages.map((lang) => (
-                <SelectItem
-                  key={lang.value}
-                  value={lang.value}
-                  className={isDarkMode ? "text-gray-100 focus:bg-gray-600" : "text-gray-900 focus:bg-gray-100"}
-                >
-                  {lang.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {/* Editor Settings */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className={`${isDarkMode ? "border-gray-600 hover:bg-gray-700 bg-gray-800 text-gray-100" : "border-gray-300 hover:bg-gray-100 bg-white text-gray-900"}`}
+            <SelectValue placeholder="Language" />
+          </SelectTrigger>
+          <SelectContent className={isDarkMode ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"}>
+            {languages.map((lang) => (
+              <SelectItem
+                key={lang.value}
+                value={lang.value}
+                className={isDarkMode ? "text-gray-100 focus:bg-gray-600" : "text-gray-900 focus:bg-gray-100"}
               >
-                <Settings className="w-4 h-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              className={`w-80 ${isDarkMode ? "bg-gray-800 border-gray-600" : "bg-white border-gray-300"}`}
+                {lang.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Editor Settings */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className={`${isDarkMode ? "border-gray-600 hover:bg-gray-700 bg-gray-800 text-gray-100" : "border-gray-300 hover:bg-gray-100 bg-white text-gray-900"}`}
             >
-              <div className="space-y-4">
-                <h4 className="font-medium">Editor Settings</h4>
-
-                <div className="space-y-2">
-                  <Label className="text-sm">Font Size: {fontSize[0]}px</Label>
-                  <Slider value={fontSize} onValueChange={setFontSize} max={24} min={10} step={1} className="w-full" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-sm">Tab Size: {tabSize[0]}</Label>
-                  <Slider value={tabSize} onValueChange={setTabSize} max={8} min={2} step={1} className="w-full" />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <Label className="text-sm">Word Wrap</Label>
-                  <Switch checked={wordWrap} onCheckedChange={setWordWrap} />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <Label className="text-sm">Minimap</Label>
-                  <Switch checked={minimap} onCheckedChange={setMinimap} />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <Label className="text-sm">Line Numbers</Label>
-                  <Switch checked={lineNumbers} onCheckedChange={setLineNumbers} />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <Label className="text-sm">Auto Indent</Label>
-                  <Switch checked={autoIndent} onCheckedChange={setAutoIndent} />
-                </div>
+              <Settings className="w-4 h-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className={`w-80 ${isDarkMode ? "bg-gray-800 border-gray-600" : "bg-white border-gray-300"}`}>
+            <div className="space-y-4">
+              <h4 className="font-medium">Editor Settings</h4>
+              <div className="space-y-2">
+                <Label className="text-sm">Font Size: {fontSize[0]}px</Label>
+                <Slider value={fontSize} onValueChange={setFontSize} max={24} min={10} step={1} className="w-full" />
               </div>
-            </PopoverContent>
-          </Popover>
+              <div className="space-y-2">
+                <Label className="text-sm">Tab Size: {tabSize[0]}</Label>
+                <Slider value={tabSize} onValueChange={setTabSize} max={8} min={2} step={1} className="w-full" />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label className="text-sm">Word Wrap</Label>
+                <Switch checked={wordWrap} onCheckedChange={setWordWrap} />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label className="text-sm">Minimap</Label>
+                <Switch checked={minimap} onCheckedChange={setMinimap} />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label className="text-sm">Line Numbers</Label>
+                <Switch checked={lineNumbers} onCheckedChange={setLineNumbers} />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label className="text-sm">Auto Indent</Label>
+                <Switch checked={autoIndent} onCheckedChange={setAutoIndent} />
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={toggleTheme}
-            className={`${isDarkMode ? "border-gray-600 hover:bg-gray-700 bg-gray-800 text-gray-100" : "border-gray-300 hover:bg-gray-100 bg-white text-gray-900"}`}
-          >
-            {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={toggleFullscreen}
+          className={`${isDarkMode ? "border-gray-600 hover:bg-gray-700 bg-gray-800 text-gray-100" : "border-gray-300 hover:bg-gray-100 bg-white text-gray-900"}`}
+        >
+          {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+        </Button>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={toggleFullscreen}
-            className={`${isDarkMode ? "border-gray-600 hover:bg-gray-700 bg-gray-800 text-gray-100" : "border-gray-300 hover:bg-gray-100 bg-white text-gray-900"}`}
-          >
-            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-          </Button>
-
-          <Button
-            onClick={handleRunCode}
-            disabled={isLoading}
-            className="bg-green-600 hover:bg-green-700 text-white px-6"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Running...
-              </>
-            ) : (
-              <>
-                <Play className="w-4 h-4 mr-2" />
-                Run Code
-              </>
-            )}
-          </Button>
-
-          <div>
-            <SignedIn>
-              <UserButton
-                afterSignOutUrl="/"
-                appearance={{
-                  elements: {
-                    avatarBox: "w-10 h-10",
-                  },
-                }}
-              />
-            </SignedIn>
-          </div>
-        </div>
-      </header>
+        <Button
+          onClick={handleRunCode}
+          disabled={isLoading}
+          className="bg-green-600 hover:bg-green-700 text-white px-6"
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Running...
+            </>
+          ) : (
+            <>
+              <Play className="w-4 h-4 mr-2" />
+              Run Code
+            </>
+          )}
+        </Button>
+      </Header>
 
       {/* Mobile Panel Switcher */}
       {isMobileView && (
-        <div className={`${headerClasses} border-b px-4 py-2 flex`}>
+        <div className={`${panelClasses} border-b px-4 py-2 flex`}>
           <Button
             variant={mobileActivePanel === "editor" ? "default" : "ghost"}
             size="sm"
@@ -445,7 +354,7 @@ export default function CodeEditor() {
                   height="100%"
                   language={selectedLanguage}
                   value={code}
-                  onChange={(value) => setCode(value || "")}
+                  onChange={(value) => ()=>setCode(value!)}
                   theme={monacoTheme}
                   options={{
                     minimap: { enabled: minimap },
@@ -474,6 +383,9 @@ export default function CodeEditor() {
                       verticalHasArrows: false,
                       horizontalHasArrows: false,
                     },
+                  }}
+                  onMount={(editor) => {
+                    editorRef.current = editor
                   }}
                 />
               </div>
@@ -540,16 +452,18 @@ export default function CodeEditor() {
                   className={`px-4 py-3 border-b ${isDarkMode ? "border-gray-700" : "border-gray-200"} flex items-center justify-between`}
                 >
                   <h2 className="text-sm font-medium">Code Editor</h2>
-                  <span className="text-xs opacity-60">
-                    {languages.find((l) => l.value === selectedLanguage)?.label}
-                  </span>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs opacity-60">
+                      {languages.find((l) => l.value === selectedLanguage)?.label}
+                    </span>
+                  </div>
                 </div>
                 <div className="flex-1">
                   <MonacoEditor
                     height="100%"
                     language={selectedLanguage}
                     value={code}
-                    onChange={(value) => setCode(value || "")}
+                    onChange={(value) => setCode(value!)}
                     theme={monacoTheme}
                     options={{
                       minimap: { enabled: false },

@@ -1,15 +1,16 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
-import "./globals.css"
 import { ClerkProvider } from "@clerk/nextjs"
 import { ThemeProvider } from "@/contexts/theme-context"
+import { EditorProvider } from "@/contexts/editor-context"
+import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "CodeSandbox - Code. Run. Share.",
-  description: "The fastest way to write, execute, and share code in your browser.",
+  title: "CodeSandbox - Online Code Editor",
+  description: "Write, run, and share code in your browser with our professional online IDE",
 }
 
 export default function RootLayout({
@@ -19,9 +20,11 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-      <html lang="en" suppressHydrationWarning>
+      <html lang="en">
         <body className={inter.className}>
-          <ThemeProvider>{children}</ThemeProvider>
+          <ThemeProvider>
+            <EditorProvider>{children}</EditorProvider>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

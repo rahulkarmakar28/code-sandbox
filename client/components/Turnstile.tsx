@@ -1,67 +1,60 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { useTheme } from "@/contexts/theme-context"
 
 interface TurnstileProps {
-  onSuccess: (token: string) => void
+  siteKey: string
+  onVerify: (token: string) => void
   onError?: () => void
-  onExpired?: () => void
-  theme?: "light" | "dark" | "auto"
-  size?: "normal" | "compact"
+  onExpire?: () => void
+  className?: string
 }
 
-declare global {
-  interface Window {
-    turnstile: {
-      render: (element: string | HTMLElement, options: any) => string
-      reset: (widgetId: string) => void
-      remove: (widgetId: string) => void
-    }
-  }
-}
-
-export default function Turnstile({ onSuccess, onError, onExpired, theme = "auto", size = "normal" }: TurnstileProps) {
-  const ref = useRef<HTMLDivElement>(null)
-  const widgetId = useRef<string | null>(null)
+export function Turnstile({ siteKey, onVerify, onError, onExpire, className }: TurnstileProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const { theme } = useTheme()
+    const isDarkMode = theme === "dark"
 
   useEffect(() => {
-    const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
+    if (!containerRef.current) return
 
-    if (!siteKey) {
-      console.error("Turnstile site key not configured")
-      return
-    }
+    // Load Cloudflare Turnstile script
+    const script = document.createElement("script")
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js"
+    script.async = true
+    script.defer = true
+    document.head.appendChild(script)
 
-    const loadTurnstile = () => {
-      if (window.turnstile && ref.current) {
-        widgetId.current = window.turnstile.render(ref.current, {
+    script.onload = () => {
+      if (window.turnstile && containerRef.current) {
+        window.turnstile.render(containerRef.current, {
           sitekey: siteKey,
-          callback: onSuccess,
+          theme: isDarkMode ? "dark" : "light",
+          callback: onVerify,
           "error-callback": onError,
-          "expired-callback": onExpired,
-          theme,
-          size,
+          "expired-callback": onExpire,
         })
       }
     }
 
-    if (window.turnstile) {
-      loadTurnstile()
-    } else {
-      const script = document.createElement("script")
-      script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js"
-      script.async = true
-      script.defer = true
-      script.onload = loadTurnstile
-      document.head.appendChild(script)
-    }
-
     return () => {
-      if (widgetId.current && window.turnstile) {
-        window.turnstile.remove(widgetId.current)
+      if (document.head.contains(script)) {
+        document.head.removeChild(script)
       }
     }
-  }, [onSuccess, onError, onExpired, theme, size])
+  }, [siteKey, onVerify, onError, onExpire, isDarkMode])
 
-  return <div ref={ref} />
+  return <div ref={containerRef} className={className} />
+}
+
+// Extend Window interface for TypeScript
+declare global {
+  interface Window {
+    turnstile: {
+      render: (container: HTMLElement, options: any) => void
+      reset: (widgetId?: string) => void
+      remove: (widgetId?: string) => void
+    }
+  }
 }
