@@ -5,7 +5,7 @@ import { Code2, Play, Zap, Globe, Users, ArrowRight, Sun, Moon } from "lucide-re
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import Link from "next/link"
-import Turnstile from "@/components/turnstile"
+import Turnstile from "@/components/Turnstile"
 import AuthSection from "@/components/auth-section"
 import { useTheme } from "@/contexts/theme-context"
 
