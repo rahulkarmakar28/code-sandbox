@@ -51,10 +51,10 @@ export default function SignInPage() {
 
 
   useEffect(() => {
-    if (!isLoaded && isSignedIn) {
-      router.push("/");
+    if (isSignedIn) {
+      router.refresh();
     }
-  }, [isLoaded, isSignedIn]);
+  }, [isSignedIn, router]);
   return (
     <div className={`min-h-screen flex flex-col ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
       {/* Header */}
