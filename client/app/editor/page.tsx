@@ -161,7 +161,7 @@ export default function CodeEditor() {
   useSocket(`${user?.id}`, (result) => {
     // console.log(result)
     const { output, error } = JSON.parse(result);
-    // console.log({output, error})
+    console.log({output, error})
     if (!error) setOutput(output);
     else setError(error)
     setIsLoading(false);
