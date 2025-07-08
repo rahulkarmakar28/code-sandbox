@@ -1,13 +1,18 @@
 "use client"
 
+import { useEffect } from "react"
 import { SignIn } from "@clerk/nextjs"
 import { useTheme } from "@/contexts/theme-context"
 import { Code2 } from "lucide-react"
+import { useUser } from "@clerk/nextjs";
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 export default function SignInPage() {
   const { theme } = useTheme()
   const isDarkMode = theme === "dark"
+  const router = useRouter()
+  const { isSignedIn, isLoaded } = useUser();
 
   const clerkAppearance = {
     variables: {
@@ -25,14 +30,14 @@ export default function SignInPage() {
       headerTitle: `text-2xl font-bold`,
       headerSubtitle: `text-sm`,
       socialButtonsBlockButton: `${isDarkMode
-          ? "bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
-          : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+        ? "bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
+        : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
         }`,
       socialButtonsBlockButtonText: ``,
       formButtonPrimary: `bg-blue-600 hover:bg-blue-700 text-white border-0 shadow-lg transition-all duration-200`,
       formFieldInput: `${isDarkMode
-          ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500"
-          : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500"
+        ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500"
+        : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500"
         }`,
       formFieldLabel: ``,
       dividerLine: ``,
@@ -44,6 +49,12 @@ export default function SignInPage() {
     },
   }
 
+
+  useEffect(() => {
+    if (!isLoaded && isSignedIn) {
+      router.push("/");
+    }
+  }, [isLoaded, isSignedIn]);
   return (
     <div className={`min-h-screen flex flex-col ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
       {/* Header */}
@@ -67,7 +78,7 @@ export default function SignInPage() {
             <p className={`${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>Sign in to your CodeSandbox account</p>
           </div>
 
-          <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" appearance={clerkAppearance} redirectUrl="/" />
+          <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" appearance={clerkAppearance} />
 
           <div className="mt-6 text-center">
             <Link

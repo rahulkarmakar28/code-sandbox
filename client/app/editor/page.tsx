@@ -222,6 +222,11 @@ export default function CodeEditor() {
       }
     }
   }, [isResizing, handleMouseMove, handleMouseUp, isMobileView])
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.updateOptions({ tabSize: tabSize[0] });
+    }
+  }, [tabSize]);
 
   const themeClasses = isDarkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
   const panelClasses = isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
