@@ -15,7 +15,7 @@ export function useSocket(roomID: string, onOutput: (output: string) => void) {
         });
 
         socket.on("connect", () => {
-            console.log("Socket connected:", socket.id);
+            // console.log("Socket connected:", socket.id);
             // console.log(roomID)
             socket.emit("joinRoom", roomID); // Join specific room
         });

@@ -14,6 +14,7 @@ import { Header } from "@/components/layout/header"
 import { useTheme } from "@/contexts/theme-context"
 import { useUser } from "@clerk/nextjs"
 import dynamic from "next/dynamic"
+import { useSocket } from "../../hooks/useSocket";
 
 // Code templates for different languages
 const codeTemplates = {
@@ -59,11 +60,11 @@ import "fmt"
 func main() {
     fmt.Println("This is made by Rahul Karmakar")
 }`,
-//   rust: `// Made by Rahul Karmakar
-// // https://www.linkedin.com/in/rahul-karmakar-605509257/
-// fn main() {
-//     println!("This is made by Rahul Karmakar");
-// }`,
+  //   rust: `// Made by Rahul Karmakar
+  // // https://www.linkedin.com/in/rahul-karmakar-605509257/
+  // fn main() {
+  //     println!("This is made by Rahul Karmakar");
+  // }`,
 }
 
 const languages = [
@@ -156,6 +157,15 @@ export default function CodeEditor() {
     setOutput("")
     setError("")
   }
+
+  useSocket(`${user?.id}`, (result) => {
+    // console.log(result)
+    const { output, error } = JSON.parse(result);
+    // console.log({output, error})
+    if (!error) setOutput(output);
+    else setError(error)
+    setIsLoading(false);
+  });
 
   const handleRunCode = async () => {
     if (!sessionStorage.getItem("verified")) {
@@ -354,7 +364,7 @@ export default function CodeEditor() {
                   height="100%"
                   language={selectedLanguage}
                   value={code}
-                  onChange={(value) => ()=>setCode(value!)}
+                  onChange={(value) => () => setCode(value!)}
                   theme={monacoTheme}
                   options={{
                     minimap: { enabled: minimap },
