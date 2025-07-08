@@ -1,6 +1,5 @@
 "use client"
 
-import { useEffect } from "react"
 import { SignIn } from "@clerk/nextjs"
 import { useTheme } from "@/contexts/theme-context"
 import { Code2 } from "lucide-react"
@@ -11,8 +10,6 @@ import { useRouter } from "next/navigation"
 export default function SignInPage() {
   const { theme } = useTheme()
   const isDarkMode = theme === "dark"
-  const router = useRouter()
-  const { isSignedIn, isLoaded } = useUser();
 
   const clerkAppearance = {
     variables: {
@@ -50,11 +47,7 @@ export default function SignInPage() {
   }
 
 
-  useEffect(() => {
-    if (isSignedIn) {
-      router.refresh();
-    }
-  }, [!isSignedIn, isLoaded, router]);
+
   return (
     <div className={`min-h-screen flex flex-col ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
       {/* Header */}

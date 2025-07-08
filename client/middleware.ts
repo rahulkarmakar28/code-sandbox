@@ -5,20 +5,16 @@ const isProtectedRoute = createRouteMatcher([
   "/editor(.*)",
 ]);
 
-export default clerkMiddleware(async (auth, req) => {
-  // console.log(isProtectedRoute(req))
-  if (isProtectedRoute(req)) {
-    const session = await auth();
-    // console.log(session)
-    if (!session.userId) {
-      const signInUrl = new URL("/sign-in", req.url);
-      return NextResponse.redirect(signInUrl);
-    }
+export default clerkMiddleware((auth, req) => {
+  const hasSessionCookie = req.headers.get("cookie")!.includes("__session=");
+  if (isProtectedRoute(req) && !hasSessionCookie) {
+    const signInUrl = new URL("/sign-in", req.url);
+    return NextResponse.redirect(signInUrl);
   }
 
   return NextResponse.next();
 });
 
 export const config = {
-  matcher: ["/editor(.*)"],
+  matcher: ["/((?!_next|favicon.ico|.*\\..*).*)"],
 };
