@@ -54,7 +54,7 @@ export default function SignInPage() {
     if (isSignedIn) {
       router.refresh();
     }
-  }, [isSignedIn, router]);
+  }, [!isSignedIn, isLoaded, router]);
   return (
     <div className={`min-h-screen flex flex-col ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
       {/* Header */}
