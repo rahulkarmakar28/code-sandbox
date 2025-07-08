@@ -1,8 +1,7 @@
 "use client"
-
 import type React from "react"
 import { useState, useRef, useCallback, useEffect } from "react"
-import { Play, Loader2, Settings, Maximize2, Minimize2, Users, Share } from "lucide-react"
+import { Play, Loader2, Settings, Maximize2, Minimize2, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
@@ -14,7 +13,7 @@ import { Header } from "@/components/layout/header"
 import { useTheme } from "@/contexts/theme-context"
 import { useUser } from "@clerk/nextjs"
 import dynamic from "next/dynamic"
-import { useSocket } from "../../hooks/useSocket";
+import { useSocket } from "../../hooks/useSocket"
 
 // Code templates for different languages
 const codeTemplates = {
@@ -60,11 +59,11 @@ import "fmt"
 func main() {
     fmt.Println("This is made by Rahul Karmakar")
 }`,
-  rust: `// Made by Rahul Karmakar
-  // https://www.linkedin.com/in/rahul-karmakar-605509257/
-  fn main() {
-      println!("This is made by Rahul Karmakar");
-  }`,
+  rust: `// Made by Rahul Karmakar  
+// https://www.linkedin.com/in/rahul-karmakar-605509257/  
+fn main() {
+    println!("This is made by Rahul Karmakar");
+}`,
 }
 
 const languages = [
@@ -95,7 +94,6 @@ export default function CodeEditor() {
   const { theme } = useTheme()
   const isDarkMode = theme === "dark"
   const { user } = useUser()
-
   const [selectedLanguage, setSelectedLanguage] = useState("python")
   const [code, setCode] = useState(codeTemplates.python)
   const [output, setOutput] = useState("")
@@ -117,8 +115,6 @@ export default function CodeEditor() {
 
   const containerRef = useRef<HTMLDivElement>(null)
   const editorRef = useRef<any>(null)
-
-
 
   // Check if mobile view
   useEffect(() => {
@@ -159,13 +155,11 @@ export default function CodeEditor() {
   }
 
   useSocket(`${user?.id}`, (result) => {
-    // console.log(result)
-    const { output, error } = JSON.parse(result);
-    // console.log({output, error})
-    if (!error) setOutput(output);
+    const { output, error } = JSON.parse(result)
+    if (!error) setOutput(output)
     else setError(error)
-    setIsLoading(false);
-  });
+    setIsLoading(false)
+  })
 
   const handleRunCode = async () => {
     if (!sessionStorage.getItem("verified")) {
@@ -175,7 +169,6 @@ export default function CodeEditor() {
     setIsLoading(true)
     setError("")
     setOutput("")
-
     if (isMobileView) {
       setMobileActivePanel("output")
     }
@@ -222,11 +215,12 @@ export default function CodeEditor() {
       }
     }
   }, [isResizing, handleMouseMove, handleMouseUp, isMobileView])
+
   useEffect(() => {
     if (editorRef.current) {
-      editorRef.current.updateOptions({ tabSize: tabSize[0] });
+      editorRef.current.updateOptions({ tabSize: tabSize[0] })
     }
-  }, [tabSize]);
+  }, [tabSize])
 
   const themeClasses = isDarkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
   const panelClasses = isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
@@ -234,104 +228,182 @@ export default function CodeEditor() {
 
   return (
     <div className={`h-screen flex flex-col ${themeClasses}`}>
-      <Header showHomeButton showSettingsButton>
-        <Select value={selectedLanguage} onValueChange={handleLanguageChange}>
-          <SelectTrigger
-            className={`w-40 ${isDarkMode ? "bg-gray-700 border-gray-600" : "bg-gray-100 border-gray-300"}`}
-          >
-            <SelectValue placeholder="Language" />
-          </SelectTrigger>
-          <SelectContent className={isDarkMode ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"}>
-            {languages.map((lang) => (
-              <SelectItem
-                key={lang.value}
-                value={lang.value}
-                className={isDarkMode ? "text-gray-100 focus:bg-gray-600" : "text-gray-900 focus:bg-gray-100"}
-              >
-                {lang.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {/* Editor Settings */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              className={`${isDarkMode ? "border-gray-600 hover:bg-gray-700 bg-gray-800 text-gray-100" : "border-gray-300 hover:bg-gray-100 bg-white text-gray-900"}`}
+      {/* Custom Header for Editor */}
+      <Header showHomeButton variant="editor" >
+        {/* Desktop Controls */}
+        <div className="hidden sm:flex items-center space-x-3">
+          <Select value={selectedLanguage} onValueChange={handleLanguageChange}>
+            <SelectTrigger
+              className={`w-40 ${isDarkMode ? "bg-gray-700 border-gray-600" : "bg-gray-100 border-gray-300"}`}
             >
-              <Settings className="w-4 h-4" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className={`w-80 ${isDarkMode ? "bg-gray-800 border-gray-600" : "bg-white border-gray-300"}`}>
-            <div className="space-y-4">
-              <h4 className="font-medium">Editor Settings</h4>
-              <div className="space-y-2">
-                <Label className="text-sm">Font Size: {fontSize[0]}px</Label>
-                <Slider value={fontSize} onValueChange={setFontSize} max={24} min={10} step={1} className="w-full" />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-sm">Tab Size: {tabSize[0]}</Label>
-                <Slider value={tabSize} onValueChange={setTabSize} max={8} min={2} step={1} className="w-full" />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label className="text-sm">Word Wrap</Label>
-                <Switch checked={wordWrap} onCheckedChange={setWordWrap} />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label className="text-sm">Minimap</Label>
-                <Switch checked={minimap} onCheckedChange={setMinimap} />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label className="text-sm">Line Numbers</Label>
-                <Switch checked={lineNumbers} onCheckedChange={setLineNumbers} />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label className="text-sm">Auto Indent</Label>
-                <Switch checked={autoIndent} onCheckedChange={setAutoIndent} />
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
+              <SelectValue placeholder="Language" />
+            </SelectTrigger>
+            <SelectContent className={isDarkMode ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"}>
+              {languages.map((lang) => (
+                <SelectItem
+                  key={lang.value}
+                  value={lang.value}
+                  className={isDarkMode ? "text-gray-100 focus:bg-gray-600" : "text-gray-900 focus:bg-gray-100"}
+                >
+                  {lang.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={toggleFullscreen}
-          className={`${isDarkMode ? "border-gray-600 hover:bg-gray-700 bg-gray-800 text-gray-100" : "border-gray-300 hover:bg-gray-100 bg-white text-gray-900"}`}
-        >
-          {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-        </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className={`${
+                  isDarkMode
+                    ? "border-gray-600 hover:bg-gray-700 bg-gray-800 text-gray-100"
+                    : "border-gray-300 hover:bg-gray-100 bg-white text-gray-900"
+                }`}
+              >
+                <Settings className="w-4 h-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              className={`w-80 ${isDarkMode ? "bg-gray-800 border-gray-600" : "bg-white border-gray-300"}`}
+            >
+              <div className="space-y-4">
+                <h4 className="font-medium">Editor Settings</h4>
+                <div className="space-y-2">
+                  <Label className="text-sm">Font Size: {fontSize[0]}px</Label>
+                  <Slider value={fontSize} onValueChange={setFontSize} max={24} min={10} step={1} className="w-full" />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm">Tab Size: {tabSize[0]}</Label>
+                  <Slider value={tabSize} onValueChange={setTabSize} max={8} min={2} step={1} className="w-full" />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm">Word Wrap</Label>
+                  <Switch checked={wordWrap} onCheckedChange={setWordWrap} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm">Minimap</Label>
+                  <Switch checked={minimap} onCheckedChange={setMinimap} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm">Line Numbers</Label>
+                  <Switch checked={lineNumbers} onCheckedChange={setLineNumbers} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm">Auto Indent</Label>
+                  <Switch checked={autoIndent} onCheckedChange={setAutoIndent} />
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
 
-        <Button
-          onClick={handleRunCode}
-          disabled={isLoading}
-          className="bg-green-600 hover:bg-green-700 text-white px-6"
-        >
-          {isLoading ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Running...
-            </>
-          ) : (
-            <>
-              <Play className="w-4 h-4 mr-2" />
-              Run Code
-            </>
-          )}
-        </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={toggleFullscreen}
+            className={`${
+              isDarkMode
+                ? "border-gray-600 hover:bg-gray-700 bg-gray-800 text-gray-100"
+                : "border-gray-300 hover:bg-gray-100 bg-white text-gray-900"
+            }`}
+          >
+            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+          </Button>
+
+          <Button
+            onClick={handleRunCode}
+            disabled={isLoading}
+            className="bg-green-600 hover:bg-green-700 text-white px-6"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Running...
+              </>
+            ) : (
+              <>
+                <Play className="w-4 h-4 mr-2" />
+                Run Code
+              </>
+            )}
+          </Button>
+        </div>
+
+        {/* Mobile Controls - Language, Settings, Run */}
+        <div className="sm:hidden flex items-center justify-end gap-9">
+          <Select value={selectedLanguage} onValueChange={handleLanguageChange}>
+            <SelectTrigger
+              className={`flex-1 max-w-[100px] text-xs ${
+                isDarkMode ? "bg-gray-700 border-gray-600" : "bg-gray-100 border-gray-300"
+              }`}
+            >
+              <SelectValue />
+              <ChevronDown className="w-3 h-3 ml-1" />
+            </SelectTrigger>
+            <SelectContent className={isDarkMode ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"}>
+              {languages.map((lang) => (
+                <SelectItem
+                  key={lang.value}
+                  value={lang.value}
+                  className={isDarkMode ? "text-gray-100 focus:bg-gray-600" : "text-gray-900 focus:bg-gray-100"}
+                >
+                  {lang.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className={`p-2 ${
+                  isDarkMode
+                    ? "border-gray-600 hover:bg-gray-700 bg-gray-800 text-gray-100"
+                    : "border-gray-300 hover:bg-gray-100 bg-white text-gray-900"
+                }`}
+              >
+                <Settings className="w-4 h-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              className={`w-72 ${isDarkMode ? "bg-gray-800 border-gray-600" : "bg-white border-gray-300"}`}
+            >
+              {/* Mobile settings content */}
+            </PopoverContent>
+          </Popover>
+
+          <Button
+            onClick={handleRunCode}
+            disabled={isLoading}
+            size="sm"
+            className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 text-xs"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                Run
+              </>
+            ) : (
+              <>
+                <Play className="w-3 h-3 mr-1" />
+                Run
+              </>
+            )}
+          </Button>
+        </div>
       </Header>
 
       {/* Mobile Panel Switcher */}
       {isMobileView && (
-        <div className={`${panelClasses} border-b px-4 py-2 flex`}>
+        <div className={`${panelClasses} border-b px-3 py-2 flex gap-2`}>
           <Button
             variant={mobileActivePanel === "editor" ? "default" : "ghost"}
             size="sm"
             onClick={() => setMobileActivePanel("editor")}
-            className="flex-1 mr-2"
+            className="flex-1 text-sm"
           >
             Code Editor
           </Button>
@@ -339,7 +411,7 @@ export default function CodeEditor() {
             variant={mobileActivePanel === "output" ? "default" : "ghost"}
             size="sm"
             onClick={() => setMobileActivePanel("output")}
-            className="flex-1"
+            className="flex-1 text-sm"
           >
             Output
           </Button>
@@ -354,7 +426,9 @@ export default function CodeEditor() {
             {/* Code Editor Panel */}
             <div className={`${panelClasses} border-r flex flex-col`} style={{ width: `${panelWidth}%` }}>
               <div
-                className={`px-4 py-3 border-b ${isDarkMode ? "border-gray-700" : "border-gray-200"} flex items-center justify-between`}
+                className={`px-4 py-3 border-b ${
+                  isDarkMode ? "border-gray-700" : "border-gray-200"
+                } flex items-center justify-between`}
               >
                 <h2 className="text-sm font-medium">Code Editor</h2>
                 <div className="flex items-center space-x-4">
@@ -408,14 +482,18 @@ export default function CodeEditor() {
 
             {/* Resize Handle */}
             <div
-              className={`w-1 cursor-col-resize hover:bg-blue-500 transition-colors ${isDarkMode ? "bg-gray-700" : "bg-gray-300"} ${isResizing ? "bg-blue-500" : ""}`}
+              className={`w-1 cursor-col-resize hover:bg-blue-500 transition-colors ${
+                isDarkMode ? "bg-gray-700" : "bg-gray-300"
+              } ${isResizing ? "bg-blue-500" : ""}`}
               onMouseDown={handleMouseDown}
             />
 
             {/* Output Panel */}
             <div className={`${panelClasses} flex flex-col`} style={{ width: `${100 - panelWidth}%` }}>
               <div
-                className={`px-4 py-3 border-b ${isDarkMode ? "border-gray-700" : "border-gray-200"} flex items-center justify-between`}
+                className={`px-4 py-3 border-b ${
+                  isDarkMode ? "border-gray-700" : "border-gray-200"
+                } flex items-center justify-between`}
               >
                 <h2 className="text-sm font-medium">Output</h2>
                 {(output || error) && (
@@ -464,14 +542,14 @@ export default function CodeEditor() {
             {mobileActivePanel === "editor" ? (
               <div className="flex-1 flex flex-col">
                 <div
-                  className={`px-4 py-3 border-b ${isDarkMode ? "border-gray-700" : "border-gray-200"} flex items-center justify-between`}
+                  className={`px-3 py-2 border-b ${
+                    isDarkMode ? "border-gray-700" : "border-gray-200"
+                  } flex items-center justify-between`}
                 >
                   <h2 className="text-sm font-medium">Code Editor</h2>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xs opacity-60">
-                      {languages.find((l) => l.value === selectedLanguage)?.label}
-                    </span>
-                  </div>
+                  <span className="text-xs opacity-60">
+                    {languages.find((l) => l.value === selectedLanguage)?.label}
+                  </span>
                 </div>
                 <div className="flex-1">
                   <MonacoEditor
@@ -482,14 +560,14 @@ export default function CodeEditor() {
                     theme={monacoTheme}
                     options={{
                       minimap: { enabled: false },
-                      fontSize: 14,
-                      lineNumbers: "on",
+                      fontSize: fontSize[0],
+                      lineNumbers: lineNumbers ? "on" : "off",
                       roundedSelection: false,
                       scrollBeyondLastLine: false,
                       automaticLayout: true,
                       tabSize: 4,
                       insertSpaces: true,
-                      wordWrap: "on",
+                      wordWrap: wordWrap ? "on" : "off",
                       contextmenu: true,
                       selectOnLineNumbers: true,
                       glyphMargin: false,
@@ -512,7 +590,9 @@ export default function CodeEditor() {
             ) : (
               <div className="flex-1 flex flex-col">
                 <div
-                  className={`px-4 py-3 border-b ${isDarkMode ? "border-gray-700" : "border-gray-200"} flex items-center justify-between`}
+                  className={`px-3 py-2 border-b ${
+                    isDarkMode ? "border-gray-700" : "border-gray-200"
+                  } flex items-center justify-between`}
                 >
                   <h2 className="text-sm font-medium">Output</h2>
                   {(output || error) && (
@@ -529,11 +609,11 @@ export default function CodeEditor() {
                     </Button>
                   )}
                 </div>
-                <div className="flex-1 p-4 overflow-auto">
+                <div className="flex-1 p-3 overflow-auto">
                   {isLoading ? (
                     <div className="flex items-center justify-center h-32">
                       <div className="flex items-center text-blue-500">
-                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         Executing code...
                       </div>
                     </div>
