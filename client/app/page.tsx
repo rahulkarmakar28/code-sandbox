@@ -2,11 +2,10 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Code2, Play, Zap, Globe, Users, ArrowRight, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 import { Turnstile } from "@/components/Turnstile"
 import { Header } from "@/components/layout/header"
 import { useTheme } from "@/contexts/theme-context"
@@ -49,12 +48,18 @@ const languages = [
 export default function Page() {
   const { theme } = useTheme()
   const isDarkMode = theme === "dark"
-  const [email, setEmail] = useState("")
-  const [isVerified, setIsVerified] = useState(true)
+  const [isVerified, setIsVerified] = useState(false)
+  useEffect(() => {
+    const stored = sessionStorage.getItem("verified") === "true";
+    setIsVerified(stored);
+  }, []);
+  function setVerify() {
+    setIsVerified(true)
+    sessionStorage.setItem("verified", "true")
+  }
 
   const themeClasses = isDarkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
   const cardClasses = isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
-
 
   return (
     <div className={`min-h-screen ${themeClasses}`}>
@@ -63,7 +68,7 @@ export default function Page() {
           <div className="h-screen w-screen flex justify-center items-center">
             <Turnstile
               siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
-              onVerify={() => setIsVerified(true)}
+              onVerify={setVerify}
               onError={() => setIsVerified(false)}
               onExpire={() => setIsVerified(false)}
             />

@@ -123,14 +123,14 @@ sequenceDiagram
 
     Browser->>Master: POST /api/v1/run {code, language}
     Master->>Redis: enqueue job
-    Master-->>Browser: respond with jobId
-    Browser->>WebSocket: connect & join room: jobId
+    Master-->>Browser: respond with success/fail enqueue
+    Browser->>WebSocket: connect & join room: roomID(userID)
     Worker->>Redis: dequeue job
     Worker->>Docker: execute code
     Docker-->>Worker: output/error
     Worker->>Redis: publish result
     Master->>Redis: subscribed to channel
-    Master->>WebSocket: emit result to room: jobId
+    Master->>WebSocket: emit result to room: roomID
 ```
 
 ## 📁 Folder Structure

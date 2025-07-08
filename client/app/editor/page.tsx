@@ -59,11 +59,11 @@ import "fmt"
 func main() {
     fmt.Println("This is made by Rahul Karmakar")
 }`,
-  rust: `// Made by Rahul Karmakar
-// https://www.linkedin.com/in/rahul-karmakar-605509257/
-fn main() {
-    println!("This is made by Rahul Karmakar");
-}`,
+//   rust: `// Made by Rahul Karmakar
+// // https://www.linkedin.com/in/rahul-karmakar-605509257/
+// fn main() {
+//     println!("This is made by Rahul Karmakar");
+// }`,
 }
 
 const languages = [
@@ -74,7 +74,7 @@ const languages = [
   { value: "cpp", label: "C++" },
   { value: "c", label: "C" },
   { value: "go", label: "Go" },
-  { value: "rust", label: "Rust" },
+  // { value: "rust", label: "Rust" },
 ]
 
 // Dynamically import Monaco Editor to avoid SSR issues

@@ -4,6 +4,7 @@ import { Inter } from "next/font/google"
 import { ClerkProvider } from "@clerk/nextjs"
 import { ThemeProvider } from "@/contexts/theme-context"
 import { EditorProvider } from "@/contexts/editor-context"
+import Script from "next/script"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -21,7 +22,12 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
+        <head />
         <body className={inter.className} suppressHydrationWarning>
+          <Script
+            src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+            strategy="beforeInteractive"
+          />
           <ThemeProvider>
             <EditorProvider>{children}</EditorProvider>
           </ThemeProvider>

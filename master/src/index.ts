@@ -9,16 +9,16 @@ import { Server } from "socket.io";
 import runRoutes from "./routes/run.route"
 import turnstileRoutes from "./routes/turnstile.route"
 import { initRedis, initSubscriberRedis } from "./config/redis.config"
-import { rateLimiter } from './middlwares/rateLimiter'
+// import { rateLimiter } from './middlwares/rateLimiter'
 import { initSubscriber } from "./services/subscriber"
 import { registerSocketHandlers } from "./socket";
 
 dotenv.config()
 
 const app = express()
-export const redisClient = initRedis()
-const redisSubscriber = initSubscriberRedis()
-initSubscriber(redisSubscriber)
+// export const redisClient = initRedis()
+// const redisSubscriber = initSubscriberRedis()
+// initSubscriber(redisSubscriber)
 
 const httpServer = createServer(app);
 export const io = new Server(httpServer, {
@@ -30,7 +30,7 @@ app.use(cors({
     origin: `${process.env.FRONTEND_URL}`,
     credentials: true
 }))
-app.use(rateLimiter)
+// app.use(rateLimiter)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
