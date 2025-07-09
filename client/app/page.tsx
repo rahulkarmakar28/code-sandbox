@@ -84,23 +84,19 @@ export default function Page() {
           </Header>
 
           {/* Hero Section */}
-          <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 lg:py-20 text-center">
+          <section className="container mx-auto px-6 py-20 text-center">
             <div className="max-w-4xl mx-auto">
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 sm:mb-8 bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent leading-tight px-2">
+              <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
                 Code. Run. Share.
               </h1>
-              <p
-                className={`text-lg sm:text-xl md:text-2xl mb-8 sm:mb-10 ${isDarkMode ? "text-gray-300" : "text-gray-600"} leading-relaxed px-4 max-w-3xl mx-auto`}
-              >
+              <p className={`text-xl md:text-2xl mb-8 ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
                 The fastest way to write, execute, and share code in your browser. No setup required, just pure coding
                 experience.
               </p>
-              <div className="flex flex-col gap-4 justify-center items-center mb-10 sm:mb-12 px-4">
-                <Link href="/editor" className="w-full max-w-xs sm:max-w-none sm:w-auto">
-                  <Button
-                    size="lg"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg w-full sm:w-auto font-medium"
-                  >
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+                <Link href="/editor">
+                  <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg">
                     <Play className="w-5 h-5 mr-2" />
                     Start Coding Now
                   </Button>
@@ -108,11 +104,10 @@ export default function Page() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className={`px-8 py-4 text-lg w-full max-w-xs sm:max-w-none sm:w-auto font-medium ${
-                    isDarkMode
-                      ? "border-gray-600 hover:bg-gray-700 bg-gray-800 text-gray-100 hover:text-white"
-                      : "border-gray-300 hover:bg-gray-50 bg-white text-gray-900 hover:text-gray-700"
-                  }`}
+                  className={`px-8 py-3 text-lg ${isDarkMode
+                    ? "border-gray-600 hover:bg-gray-700 bg-gray-800 text-gray-100 hover:text-white"
+                    : "border-gray-300 hover:bg-gray-50 bg-white text-gray-900 hover:text-gray-700"
+                    }`}
                 >
                   View Examples
                 </Button>
@@ -120,15 +115,14 @@ export default function Page() {
 
               {/* Language Pills */}
               <div className="px-4">
-                <div className="flex flex-wrap justify-center gap-3 mb-16 max-w-2xl mx-auto">
+                <div className="flex flex-wrap justify-center gap-3 mb-16 mx-auto">
                   {languages.map((lang) => (
                     <div
                       key={lang.name}
-                      className={`${cardClasses} px-4 py-2.5 rounded-full border flex items-center space-x-2 transition-all duration-200 ${
-                        isDarkMode
+                      className={`${cardClasses} px-4 py-2.5 rounded-full border flex items-center space-x-2 transition-all duration-200 ${isDarkMode
                           ? "hover:bg-gray-700 hover:border-gray-600"
                           : "hover:bg-gray-100 hover:border-gray-400"
-                      }`}
+                        }`}
                     >
                       <div className={`w-3 h-3 rounded-full ${lang.color}`}></div>
                       <span className="text-sm font-medium whitespace-nowrap">{lang.name}</span>
@@ -153,13 +147,12 @@ export default function Page() {
               {features.map((feature, index) => (
                 <Card
                   key={index}
-                  className={`${cardClasses} p-6 text-center hover:shadow-lg transition-all duration-300 ${
-                    isDarkMode ? "hover:bg-gray-750 hover:border-gray-600" : "hover:bg-gray-50 hover:border-gray-300"
-                  }`}
+                  className={`${cardClasses} p-6 text-center hover:shadow-lg transition-all duration-300 ${isDarkMode ? "hover:bg-gray-750 hover:border-gray-600" : "hover:bg-gray-50 hover:border-gray-300"
+                    }`}
                 >
                   <CardContent className="p-0">
                     <div className="text-blue-500 mb-4 flex justify-center">{feature.icon}</div>
-                    <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
+                    <h3 className="text-xl font-semibold mb-3 text-gray-500">{feature.title}</h3>
                     <p className={`${isDarkMode ? "text-gray-300" : "text-gray-600"} leading-relaxed`}>
                       {feature.description}
                     </p>
@@ -182,14 +175,12 @@ export default function Page() {
               </div>
               <div className="max-w-4xl mx-auto">
                 <Card
-                  className={`${cardClasses} overflow-hidden shadow-xl ${
-                    isDarkMode ? "shadow-gray-900/50" : "shadow-gray-200/50"
-                  }`}
+                  className={`${cardClasses} overflow-hidden shadow-xl ${isDarkMode ? "shadow-gray-900/50" : "shadow-gray-200/50"
+                    }`}
                 >
                   <div
-                    className={`px-4 py-3 border-b ${
-                      isDarkMode ? "border-gray-700" : "border-gray-200"
-                    } flex items-center space-x-2`}
+                    className={`px-4 py-3 border-b ${isDarkMode ? "border-gray-700" : "border-gray-200"
+                      } flex items-center space-x-2`}
                   >
                     <div className="w-3 h-3 rounded-full bg-red-500"></div>
                     <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
@@ -217,9 +208,8 @@ for i in range(10):
                       <Link href="/editor">
                         <Button
                           size="sm"
-                          className={`bg-green-600 hover:bg-green-700 text-white transition-all duration-200 ${
-                            isDarkMode ? "shadow-lg shadow-green-600/20" : "shadow-md"
-                          }`}
+                          className={`bg-green-600 hover:bg-green-700 text-white transition-all duration-200 ${isDarkMode ? "shadow-lg shadow-green-600/20" : "shadow-md"
+                            }`}
                         >
                           <Play className="w-4 h-4 mr-1" />
                           Try It
