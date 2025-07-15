@@ -35,7 +35,7 @@ export const executeCode = async (file: fileType, config: configType) => {
   }
 
   const fullCommand = config.cmd(filename);
-  const dockerCmd = `timeout 180 docker run --rm \
+  const dockerCmd = `sudo timeout 180 docker run --rm \
     --name ${containerName} \
     -v "${tempDir}:/app" \
     --network none \
