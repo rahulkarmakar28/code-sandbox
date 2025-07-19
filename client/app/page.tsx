@@ -64,13 +64,26 @@ export default function Page() {
     <div className={`min-h-screen ${themeClasses}`}>
       {!isVerified ? (
         <>
-          <div className="h-screen w-screen flex justify-center items-center px-4">
-            <Turnstile
-              siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
-              onVerify={setVerify}
-              onError={() => setIsVerified(false)}
-              onExpire={() => setIsVerified(false)}
-            />
+          <div className="h-screen w-screen bg-gray-50 flex items-center justify-center px-4">
+            <div className="max-w-md w-full bg-white shadow-lg rounded-2xl p-6 text-center space-y-6">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-800">Verify You’re Human</h1>
+                <p className="text-gray-500 mt-2">
+                  Please complete the Turnstile check below to continue.
+                </p>
+              </div>
+
+              <Turnstile
+                siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+                onVerify={setVerify}
+                onError={() => setIsVerified(false)}
+                onExpire={() => setIsVerified(false)}
+              />
+
+              <footer className="text-sm text-gray-400 pt-4 border-t border-gray-200">
+                © {new Date().getFullYear()} rahulkarmakar.me — All rights reserved.
+              </footer>
+            </div>
           </div>
         </>
       ) : (
@@ -120,8 +133,8 @@ export default function Page() {
                     <div
                       key={lang.name}
                       className={`${cardClasses} px-4 py-2.5 rounded-full border flex items-center space-x-2 transition-all duration-200 ${isDarkMode
-                          ? "hover:bg-gray-700 hover:border-gray-600"
-                          : "hover:bg-gray-100 hover:border-gray-400"
+                        ? "hover:bg-gray-700 hover:border-gray-600"
+                        : "hover:bg-gray-100 hover:border-gray-400"
                         }`}
                     >
                       <div className={`w-3 h-3 rounded-full ${lang.color}`}></div>
