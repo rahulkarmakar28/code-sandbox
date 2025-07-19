@@ -64,12 +64,12 @@ export default function Page() {
     <div className={`min-h-screen ${themeClasses}`}>
       {!isVerified ? (
         <>
-          <div className="h-screen w-screen bg-gray-50 flex items-center justify-center px-4">
-            <div className="max-w-md w-full bg-white shadow-lg rounded-2xl p-6 text-center space-y-6">
+          <div className="h-screen w-screen bg-gray-900 flex items-center justify-center px-4">
+            <div className="max-w-md w-full bg-gray-800 shadow-2xl rounded-2xl p-6 text-center space-y-6">
               <div>
-                <h1 className="text-3xl font-bold text-gray-800">Verify You’re Human</h1>
-                <p className="text-gray-500 mt-2">
-                  Please complete the Turnstile check below to continue.
+                <h1 className="text-3xl font-bold text-white">Human Verification</h1>
+                <p className="text-gray-300 mt-2">
+                  Please complete the Turnstile check to proceed.
                 </p>
               </div>
 
@@ -80,7 +80,13 @@ export default function Page() {
                 onExpire={() => setIsVerified(false)}
               />
 
-              <footer className="text-sm text-gray-400 pt-4 border-t border-gray-200">
+              {isVerified && (
+                <div className="text-green-400 font-medium">
+                  ✅ Verification successful!
+                </div>
+              )}
+
+              <footer className="text-sm text-gray-500 pt-4 border-t border-gray-700">
                 © {new Date().getFullYear()} rahulkarmakar.me — All rights reserved.
               </footer>
             </div>
