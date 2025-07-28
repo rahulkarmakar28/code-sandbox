@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Turnstile } from "@/components/Turnstile"
 import { Header } from "@/components/layout/header"
 import { useTheme } from "@/contexts/theme-context"
+import { turnstileVerify } from "@/app/services/operation"
 import Link from "next/link"
 
 const features = [
@@ -52,9 +53,19 @@ export default function Page() {
     setIsVerified(stored)
   }, [])
 
-  function setVerify() {
-    setIsVerified(true)
-    sessionStorage.setItem("verified", "true")
+  async function setVerify(token: string) {
+    try {
+      const res = await turnstileVerify(token);
+      if (res.success) {
+        setIsVerified(true);
+        sessionStorage.setItem("verified", "true");
+      } else {
+        setIsVerified(false);
+      }
+    } catch (e) {
+      console.error("Verification failed", e);
+      setIsVerified(false);
+    }
   }
 
   const themeClasses = isDarkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"

@@ -1,5 +1,5 @@
 import { apiConnector } from "./apiConnector";
-import { runCodeApi } from "./api"
+import { runCodeApi, turnstileVerifyApi } from "./api"
 import axios, { AxiosError } from "axios";
 
 type RunCodeResponse = {
@@ -27,6 +27,34 @@ export const runCodeService = async (code: string, language: string, roomId: str
             "Failed to run code";
 
         console.log(serverMessage);
+        throw new Error(serverMessage);
+    }
+};
+
+
+export const turnstileVerify = async (token: string) => {
+    try {
+        const response = await apiConnector<{
+            success: boolean;
+            message: string;
+        }>(
+            "POST",
+            `${turnstileVerifyApi}`,
+            { token },
+            {
+                "Content-Type": "application/json",
+            }
+        );
+
+        return response.success;
+    } catch (error) {
+        const axiosError = error as AxiosError<{ message: string }>;
+        const serverMessage =
+            axiosError.response?.data?.message ||
+            axiosError.message ||
+            "Turnstile verification failed";
+
+        console.error(serverMessage);
         throw new Error(serverMessage);
     }
 };
