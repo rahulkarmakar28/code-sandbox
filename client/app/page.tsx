@@ -56,7 +56,7 @@ export default function Page() {
   async function setVerify(token: string) {
     try {
       const res = await turnstileVerify(token);
-      if (res.success) {
+      if (res) {
         setIsVerified(true);
         sessionStorage.setItem("verified", "true");
       } else {

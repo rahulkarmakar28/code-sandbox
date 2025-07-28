@@ -46,7 +46,7 @@ export const turnstileVerify = async (token: string) => {
             }
         );
 
-        return response.success;
+        return response.data.success;
     } catch (error) {
         const axiosError = error as AxiosError<{ message: string }>;
         const serverMessage =
